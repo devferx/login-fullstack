@@ -9,6 +9,11 @@ boton.addEventListener('click', () => {
     password:Number(password.value)
     }).then((resp) => {
         const {data} = resp;
-        Swal.fire({title: data.mensaje})
+        if (data.existoso) {
+            localStorage.setItem('user', JSON.stringify(data.usuario))
+            location.href= '/home'
+        }else {
+            Swal.fire({title: data.mensaje})
+        }
     })
 })

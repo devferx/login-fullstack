@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="container">
+    <section class="contenedor">
+      <img id="imagen" src="https://www.gravatar.com/avatar/1aedb8d9dc4751e229a335e371db8058?s=200" alt="">
+      <h1 id="correo">Tu correo es:</h1>
+      <h2 id="password">Tu contraseña: 123</h2>
+      <button id="boton">Cerrar Sesión</button>
+    </section>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.13.0/js/md5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      const imagen$ = document.getElementById('imagen')
+      const correo$ = document.getElementById('correo')
+      const password$ = document.getElementById('password')
+      const boton$ = document.getElementById('boton')
+      const user  = JSON.parse(localStorage.getItem('user'))
+      boton$.addEventListener('click', () => {
+        axios.get('/api/logout').then(()  => {
+            location.href  = '/login/'
+        })
+      })
+
+      correo$.innerText = `Tu correo es: ${user.email}`
+      password$.innerText = `Tu contraseña es: ${user.password}`
+      const correoEncriptado = md5(user.email.toLowerCase())
+      imagen$.src = `https://www.gravatar.com/avatar/${correoEncriptado}?s=200`
+      //
+    </script>
+  </div>
+</body>
+</html>

@@ -3,33 +3,60 @@ const Mongodb  = require('./lib/mongodb');
 
 const server = express();
 
+let conectado = false;
+
 server.use(express.json());
 
 server.use('/login', express.static('login'));
 server.use('/registro', express.static('registro'));
+server.use('/home', express.static('home'));
 
 const mongo = new Mongodb();
 
+
 server.post('/api/login',async (req,res) => {
     const {email, password} = req.body;
-    const resultado = await mongo.getAll('users', {email : email})
-    const [primero] = resultado;
-    if(primero) {
-        if(password === primero.password ){
-            res.json({
-                usuario: primero,
-                mensaje: 'Iniciaste sesion correctamente'
-            })
-        }else {
+    try {
+        const resultado = await mongo.getAll('users', { email: email })
+        const [primero] = resultado;
+        if(!conectado) {
+            if (primero) {
+                if (password === primero.password) {
+                    conectado = true;
+                    res.json({
+                        usuario: primero,
+                        mensaje: 'Iniciaste sesion correctamente',
+                        existoso: true,
+                        conectado
+                    })
+                } else {
+                    res.json({
+                        mensaje: 'Datos Incorrectos vuelve a intentarlo',
+                        existoso: false,
+                    })
+                }
+            } else {
                 res.json({
-                    mensaje: 'Datos Incorrectos vuelve a intentarlo'
+                    mensaje: 'Datos Incorrectos vuelve a intentarlo',
+                    existoso: false
                 })
             }
-        } else {
+        }else {
             res.json({
-                mensaje: 'Datos Incorrectos vuelve a intentarlo'
+                mensaje: 'Ya alguien esta conectado',
+                existoso: false
             })
+        }
+    } catch (err) {
+        console.log(err)
     }
+})
+
+server.get('/api/logout', (req,res) => {
+    conectado  = false;
+    res.json({
+        existoso: true
+    })
 })
 
 
