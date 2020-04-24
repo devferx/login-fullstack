@@ -7,6 +7,6 @@ boton.addEventListener('click', () => {
     email: email.value
     }).then((resp) => {
         const {mensaje, password} = resp.data;
-        Swal.fire({title:`${mensaje} y tu contraseña es ${password}`})
+        Swal.fire({title:`${mensaje}`})
     })
 })

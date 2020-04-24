@@ -14,11 +14,16 @@ server.use('/home', express.static('home'));
 const mongo = new Mongodb();
 
 
+async function searchUser(email) {
+    resultados = await mongo.getAll('users', { email: email })
+    return resultados;
+}
+
 server.post('/api/login',async (req,res) => {
     const {email, password} = req.body;
     try {
-        const resultado = await mongo.getAll('users', { email: email })
-        const [primero] = resultado;
+        const resultados = await searchUser(email);
+        const [primero] = resultados;
         if(!conectado) {
             if (primero) {
                 if (password === primero.password) {
@@ -52,6 +57,28 @@ server.post('/api/login',async (req,res) => {
     }
 })
 
+server.get('/api/getAllUsers', async (req,res)  => {
+    const resultados =await mongo.getAll('users', {})
+    res.json({
+        resultados
+    })
+})
+
+server.delete('/api/deleteUser/:userId', async(req,res) => {
+    const {userId} = req.params;
+    try {
+        const resultado = await mongo.delete('users', userId);
+        res.json({
+            ok: true,
+            resultado
+        })
+    } catch (error) {
+        res.json({
+            ok: false
+        })
+    }
+})
+
 server.get('/api/logout', (req,res) => {
     conectado  = false;
     res.json({
@@ -66,13 +93,12 @@ server.post('/api/signin', async (req,res) => {
     const [primero] = resultado;
     if  (primero) {
         res.json({
-            mensaje: 'existe el usuario',
-            password: 'ninguna'
+            mensaje: 'ya existe el usuario',
         })
-    }else {
+    }else{
         const password = Math.round(Math.random() * 100000);
         const results = await mongo.create('users', {email, password})
-        res.json({mensaje: 'Usuario creado', usuario: results, password})
+        res.json({ mensaje: `Usuario creado, la contraseña es:  ${password}`, usuario: results, password})
     }
 })
 
